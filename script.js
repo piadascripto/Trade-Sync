@@ -686,7 +686,11 @@ const formattedOrders = orders.map(order => {
 	const updatedOrder = Object.fromEntries(
 		Object.entries(order).map(([key, value]) => {
 			if (typeof value === 'number') {
-				return [key.replace('/', ''), parseFloat(value.toFixed(2))];
+				if (key === 'TradeID'|| key === 'Quantity') {
+					return [key.replace('/', ''), value];
+				} else {
+					return [key.replace('/', ''), Math.floor(value * 100) / 100];
+				}
 			}
 			return [key.replace('/', ''), value];
 		})
@@ -738,8 +742,10 @@ sortedOrders.forEach((order) => {
 
 	trades[Symbol].Orders.push(selectedProperties);
 	trades[Symbol].TradeQuantity += Quantity;
-	trades[Symbol].TradeResult += TradeMoney;
-	trades[Symbol].BrokerCommission += IBCommission;
+	trades[Symbol].TradeResult = parseFloat((trades[Symbol].TradeResult + TradeMoney).toFixed(2));
+	trades[Symbol].BrokerCommission = parseFloat((trades[Symbol].BrokerCommission + IBCommission).toFixed(2));
+
+
 
 	const sum = trades[Symbol].Orders.reduce((total, t) => total + t.Quantity, 0);
 	if (sum === 0) {
@@ -775,11 +781,8 @@ Object.values(trades).forEach((trade) => {
 		delete trade.TradeQuantity;
 
 	}
-}),
+})
 
-
-
-	console.log(Object.keys(trades));
 
 
 // Basic results
